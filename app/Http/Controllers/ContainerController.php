@@ -31,7 +31,7 @@ class ContainerController extends Controller
             $product_data['container_id'] = $container->id;
             Product::create($product_data);
         }
-        return response()->json(['message' => "Container {$container->id} will added"], 200);
+        return response()->json(['message' => "Container {$container->id} will added"], 201);
     }
 
     /**
