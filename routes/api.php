@@ -20,3 +20,5 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::get('/containers', 'ContainerController@index')->middleware(\App\Http\Middleware\ForceJsonResponse::class);
 Route::get('/containers/{id}', 'ContainerController@show')->middleware(\App\Http\Middleware\ForceJsonResponse::class);
 Route::post('/containers/add', 'ContainerController@add')->middleware(\App\Http\Middleware\ForceJsonResponse::class);
+
+Route::get('/photostudio/containers', 'PhotoStudioSetsController@index')->middleware(\App\Http\Middleware\ForceJsonResponse::class);
