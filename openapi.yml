@@ -1,0 +1,101 @@
+openapi: 3.0.0
+info:
+  description:
+    API logistic for search for the minimum number of containers containing all unique products
+  version: 1.0.0
+  title: Lamoda logistic api
+  contact:
+    email: "alexandr.dikov@mail.ru"
+servers:
+- url: 'http://localhost/api'
+paths:
+  /containers:
+    get:
+      summary: List all containers
+      operationId: listContainers
+      responses:
+        '200':
+          description: A paged array of containers
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/containers"
+  /containers/{id}:
+    get:
+      summary: get containers
+      operationId: getContainer
+      responses:
+        '200':
+          description: Container with products
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/container"
+  /containers/add:
+    post:
+      summary: Create a container
+      operationId: createContainer
+      responses:
+        '201':
+          description: Container create message
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/container"
+  /studiosets:
+    get:
+      summary: List minimal set containers with all unique products
+      operationId: listContainersStudio
+      responses:
+        '200':
+          description: A paged array of containers
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/containers"
+
+components:
+  schemas:
+    product:
+      type: object
+      required:
+      - id
+    container:
+      type: object
+      required:
+      - id
+      - products
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        products:
+          type: array
+          items:
+            $ref: "#/components/schemas/product"
+    containers:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/container"
+        current_page:
+          type: integer
+        first_page_url:
+          type: string
+        next_page_url:
+          type: string
+        prev_page_url:
+          type: string
