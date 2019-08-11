@@ -5,6 +5,7 @@
 - composer install
 - docker-compose up -d
 - docker exec -it app php artisan migrate
+- docker exec -it app php artisan containers:generate --size 10 --unique 100 --count=1000
 
 
 Для решения задачи о минимальном числе контейнеров, содержащих все уникальные товары
