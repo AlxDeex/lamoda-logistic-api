@@ -9,6 +9,7 @@ use Faker;
 
 class GenContainers extends Command
 {
+    const BULK_INSERT_CHUNK = 200;
     /**
      * The name and signature of the console command.
      *
@@ -33,6 +34,11 @@ class GenContainers extends Command
 
     protected $productFaker;
     protected $containerFaker;
+
+    protected $bulkInserts = [
+        'containers' => [],
+        'products' => []
+    ];
 
     /**
      * Create a new command instance.
@@ -74,19 +80,34 @@ class GenContainers extends Command
                 'id' => $container_id,
                 'name' => $this->containerFaker->unique()->uuid,
             ];
-            try {
-                Container::create($container);
-                for ($j = 0; $j < $this->size; $j++) {
-                    $id = $this->productFaker->numberBetween(0, $this->unique - 1);
-                    $product = $this->products[$id];
-                    $product['container_id'] = $container_id;
-                    Product::create($product);
-                }
-            } catch (\Exception $e) {
-                $this->warn($e->getMessage());
+            $this->bulkInserts['containers'][] = $container;
+            for ($j = 0; $j < $this->size; $j++) {
+                $id = $this->productFaker->numberBetween(0, $this->unique - 1);
+                $product = $this->products[$id];
+                $product['container_id'] = $container_id;
+                $this->bulkInserts['products'][] = $product;
             }
             $this->info('conteainer ' . ($i + 1) . ' generated with id: ' . $container_id);
+            if (count($this->bulkInserts['containers']) > self::BULK_INSERT_CHUNK
+                || count($this->bulkInserts['products']) > self::BULK_INSERT_CHUNK) {
+                $this->write();
+            }
         }
+        $this->write();
+
+    }
+
+    protected function write()
+    {
+        try {
+            Container::insert($this->bulkInserts['containers']);
+            Product::insert($this->bulkInserts['products']);
+        } catch (\Exception $e) {
+            $this->warn($e->getMessage());
+            return false;
+        }
+        $this->bulkInserts = ['containers' => [], 'products' => []];
+        return true;
     }
 
     protected function generateProducts()
